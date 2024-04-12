@@ -1,0 +1,111 @@
+---
+title: "VIOLENCIA SEXUAL - COLOMBIA"
+output: 
+  flexdashboard::flex_dashboard:
+    logo: "img/logo.png"
+    theme:
+      bg: "#E1E8Ec"
+      fg: "#0B3948" 
+      primary: "#416165"
+      base_font:
+        google: Prompt
+      code_font:
+        google: JetBrains Mono
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+# paquetes empleados
+library(flexdashboard)
+
+library(readr)
+
+library(tidyr)
+
+library(sf)
+library(rnaturalearth)
+library(ggplot2)
+library(gridExtra)
+library(raster)
+library(scales)
+
+# carga de mapas
+COL <- read_sf("map/COL_adm0.shp")
+COLdep <- read_sf("map/COL_adm1.shp")
+COLmun <- read_sf("map/COL_adm2.shp")
+
+# bases de datos
+dptos <- read_csv("data/dptos.csv")
+casosCo <- read_csv("data/casosCo.csv")
+sex22 <- read_csv("data/sex22.csv")
+
+```
+
+Column {data-width=650 .tabset}
+-----------------------------------------------------------------------
+
+### Casos 2021
+
+```{r}
+library(ggplot2)
+
+# Ordenar los datos por casosh de mayor a menor
+casosCo <- casosCo[order(-casosCo$casos), ]
+
+# Crear una paleta de colores degradada de rojos
+red_palette <- colorRampPalette(c("#FFC685", "#AE123A"))(nrow(casosCo))
+
+# Gráfico de barras
+ggplot(casosCo, aes(x = reorder(ndep, casos), y = casosh, fill = casos)) + 
+  geom_col() + 
+  geom_text(aes(label = casos), hjust = -0.1, size = 2, color = "gray30") +
+  scale_y_continuous(labels = scales::comma, name = "", expand = expansion(mult = c(0, 0.05))) +
+  scale_fill_gradientn(colors = red_palette, guide = FALSE) +
+  coord_flip() + 
+  theme_minimal() +
+  theme(
+    text = element_text(color = "gray30"),
+    axis.text.y = element_text(size = 5, color = "gray30"),
+    axis.text.x = element_text(size = 5, color = "gray30"),
+    legend.position = "none",
+    plot.margin = margin(1, 1, 1, 2),
+    axis.title = element_text(size = 6)
+  ) +
+  labs(
+    x = "Departamentos",
+    y = "Casos "
+  )
+
+```
+
+### Chart B
+
+```{r}
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Mapa 
+
+```{r}
+require(sp)
+ require(rgdal)
+ require(raster)
+ require(RColorBrewer)
+library(tidyverse)
+
+ mi.palette <- brewer.pal(n = 7, name = "OrRd")   # paleta de colores
+ mapco=shapefile("map/depto.shp")  # importa mapa en formato .shp
+ # colombia=readRDS("data/Colombia.RDS")
+ # colombia$departamento_nom= str_to_upper(colombia$departamento_nom)
+ # t=table(colombia$departamento_nom,colombia$estado)
+ fallecidos=c(15174,3876,26516,807,2417,2151,880,1333,2388,3487,6495,382,2880,
+             1296,1380,2076,2861,3961,1635,2119,6934,1546,3411,11929,400,844,
+             620,249,29,87,17,45,133) # vector con información
+ mapco@data$fallecidos=fallecidos # se adiciona variable con 33 valores = 33 dptos, en mismo orden
+ spplot(mapco[,6], col.regions = mi.palette, cuts = 6)  # mapa
+```
+
