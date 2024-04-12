@@ -1,0 +1,43 @@
+---
+title: "VIOLENCIA SEXUAL"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(readr)
+vsex1122 <- read_csv("data/violencia_sex_2011_2022.csv")
+
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Edad por rangos - casos de violencia sexual  2011 - 2022
+
+```{r}
+tabla1 <- table(vsex1122$edadR)
+barplot(tabla1)
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+tabla1 <- table(vsex1122$edadR)
+pie(tabla1)
+
+```
+
+### Chart C
+
+```{r}
+kableExtra::kable(tabla1)
+```
+
